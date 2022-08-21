@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Service
+//@Service
 public class EmployeeService {
 
     EmployeeRepository employeeRepository;
@@ -25,13 +25,17 @@ public class EmployeeService {
 
     @Transactional
     public Employee updateEmployee(String id, Employee employee) {
-        return employeeRepository.findById(id).map(
-                employee1 -> {
-                    if(employee.getAge() != 0) employee1.setAge(employee.getAge());
-                    if(employee.getPhone() != null) employee1.setPhone(employee.getPhone());
-                    return employee1;
-                }
-        ).orElseThrow(() -> new RuntimeException("Employee not found"));
+        Employee employee1 = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+        if(employee.getAge() != 0) employee1.setAge(employee.getAge());
+        if(employee.getPhone() != null) employee1.setPhone(employee.getPhone());
+        employeeRepository.save(employee1);
+        doSomething();
+        return employee1;
+    }
+
+    private void doSomething() {
+        throw new RuntimeException("Update should fail");
     }
 
     public List<Employee> getEmployeesWithAgeGreaterThan(int age) {
